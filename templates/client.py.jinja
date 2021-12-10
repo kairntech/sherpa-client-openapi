@@ -44,15 +44,50 @@ class AuthenticatedClient(Client):
         """ Get headers to be used in authenticated endpoints """
         return {"Authorization": f"Bearer {self.token}", **self.headers}
 
-from .models import Credentials, RequestJwtTokenProjectAccessMode, BearerToken
-from .types import Unset, UNSET, Response
+from .models import BearerToken, Credentials, RequestJwtTokenProjectAccessMode
+from .types import UNSET, Response, Unset
+from httpx import BasicAuth, Cookies
+from httpx import Client as HttpxClient
+from httpx import Response as HttpxResponse
+import pkg_resources
+
+
 @attr.s(auto_attribs=True)
-class SherpaClient(AuthenticatedClient):
+class SherpaClient(Client):
     """A Client logged"""
 
     token: str = attr.ib(init=True, default=None)
+    session_cookies: Dict[str, str] = attr.ib(factory=dict, kw_only=True, init=True)
 
-    def login(
+    def get_headers(self) -> Dict[str, str]:
+        """Get headers to be used in authenticated endpoints"""
+        if self.token is not None:
+            return {"Authorization": f"Bearer {self.token}", **self.headers}
+        else:
+            return {**self.headers}
+
+    def get_cookies(self) -> Dict[str, str]:
+        """Get cookies to be used in authenticated endpoints"""
+        if self.session_cookies:
+            return {**self.session_cookies, **self.cookies}
+        else:
+            return {**self.cookies}
+
+    def login_with_cookie(self, credentials: Credentials):
+        """ """
+        my_version = pkg_resources.get_distribution("sherpa-client")
+        httpx_client = HttpxClient(
+            base_url=self.base_url,
+            auth=BasicAuth(username=credentials.email, password=credentials.password),
+            headers={"User-Agent": f"{my_version.key}/{my_version.parsed_version}"},
+        )
+        res: HttpxResponse = httpx_client.get("/users", params={"username": credentials.email})
+        if res.is_success and res.cookies:
+            self.session_cookies = {k: res.cookies[k] for k in res.cookies}
+        else:
+            res.raise_for_status()
+
+    def login_with_token(
         self,
         credentials: Credentials,
         project_filter: Union[Unset, None, str] = UNSET,
