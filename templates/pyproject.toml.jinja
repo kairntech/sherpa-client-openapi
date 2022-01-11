@@ -1,0 +1,50 @@
+{% if use_poetry %}
+[tool.poetry]
+name = "{{ project_name }}"
+version = "{{ package_version }}"
+description = "{{ package_description }}"
+
+authors = []
+
+readme = "README.md"
+packages = [
+    {include = "{{ package_name }}"},
+]
+include = ["CHANGELOG.md", "{{ package_name }}/py.typed"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+httpx = ">=0.15.4,<0.21.0"
+attrs = ">=20.1.0,<22.0.0"
+python-dateutil = "^2.8.0"
+shortuuid = "^1.0.8"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+pytest-cov = "^3.0.0"
+typing-extensions = "^4.0.1"
+black = "^21.12b0"
+
+
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 120
+target_version = ['py37', 'py38']
+exclude = '''
+(
+  /(
+    | \.git
+    | \.idea
+    | \.venv
+    | \.mypy_cache
+  )/
+)
+'''
+
+[tool.isort]
+line_length = 120
+profile = "black"
