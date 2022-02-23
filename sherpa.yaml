@@ -8308,7 +8308,6 @@ components:
       additionalProperties: false
     DocCategory:
       required:
-      - identifier
       - labelName
       type: object
       properties:
