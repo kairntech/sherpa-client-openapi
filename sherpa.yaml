@@ -9081,7 +9081,6 @@ components:
       additionalProperties: false
     ProjectBean:
       required:
-      - description
       - image
       - label
       - lang
