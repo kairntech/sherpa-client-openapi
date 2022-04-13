@@ -334,7 +334,6 @@ components:
           type: "string"
       required:
       - "engine"
-      - "favorite"
       - "label"
       - "name"
       type: "object"
@@ -1278,7 +1277,7 @@ components:
       additionalProperties: false
       description: ""
       properties:
-        alTexts:
+        altTexts:
           description: "document alternative texts"
           type: "object"
         annotations:
