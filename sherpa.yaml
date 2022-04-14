@@ -351,12 +351,12 @@ components:
         access_token:
           description: ""
           type: "string"
-        email:
+        username:
           description: ""
           type: "string"
       required:
       - "access_token"
-      - "email"
+      - "username"
       type: "object"
     Bucket:
       additionalProperties: false
