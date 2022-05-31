@@ -2722,6 +2722,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -2787,6 +2796,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
@@ -2863,6 +2881,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       requestBody:
         content:
           multipart/form-data:
@@ -2930,6 +2957,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
@@ -3008,6 +3044,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       requestBody:
         content:
           application/json:
@@ -3080,6 +3125,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -3147,6 +3201,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
@@ -4037,6 +4100,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -4842,6 +4914,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -4986,6 +5067,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
@@ -8218,6 +8308,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -8303,6 +8402,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
@@ -8400,6 +8508,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       requestBody:
         content:
           application/json:
@@ -8484,6 +8601,15 @@ paths:
         explode: true
         in: "query"
         name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
         required: false
         schema:
           default: false
