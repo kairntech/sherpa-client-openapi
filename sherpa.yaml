@@ -153,6 +153,10 @@ components:
         metadata:
           description: "document metadata"
           type: "object"
+        altTexts:
+          items:
+            $ref: "#/components/schemas/DocAltText"
+          type: "array"
         sentences:
           items:
             $ref: "#/components/schemas/DocSentence"
@@ -1277,9 +1281,6 @@ components:
       additionalProperties: false
       description: ""
       properties:
-        altTexts:
-          description: "document alternative texts"
-          type: "object"
         annotations:
           items:
             $ref: "#/components/schemas/DocAnnotation"
@@ -1294,6 +1295,10 @@ components:
         metadata:
           description: "document metadata"
           type: "object"
+        altTexts:
+          items:
+            $ref: "#/components/schemas/DocAltText"
+          type: "array"
         sentences:
           items:
             $ref: "#/components/schemas/DocSentence"
