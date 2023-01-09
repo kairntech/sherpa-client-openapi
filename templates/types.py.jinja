@@ -1,5 +1,6 @@
 """ Contains some shared types for properties """
-from typing import Any, BinaryIO, Generic, MutableMapping, Optional, TextIO, Tuple, TypeVar, Union
+from http import HTTPStatus
+from typing import Any, BinaryIO, Generic, MutableMapping, Optional, Tuple, TypeVar
 
 import attr
 from httpx import codes, HTTPError
@@ -12,14 +13,14 @@ class Unset:
 UNSET: Unset = Unset()
 
 {# Used as `FileProperty._json_type_string` #}
-FileJsonType = Tuple[Optional[str], Union[BinaryIO, TextIO], Optional[str]]
+FileJsonType = Tuple[Optional[str], BinaryIO, Optional[str]]
 
 
 @attr.s(auto_attribs=True)
 class File:
     """ Contains information for file uploads """
 
-    payload: Union[BinaryIO, TextIO]
+    payload: BinaryIO
     file_name: Optional[str] = None
     mime_type: Optional[str] = None
 
@@ -35,7 +36,7 @@ T = TypeVar("T")
 class Response(Generic[T]):
     """ A response from an endpoint """
 
-    status_code: int
+    status_code: HTTPStatus
     content: bytes
     headers: MutableMapping[str, str]
     parsed: Optional[T]
@@ -45,14 +46,14 @@ class Response(Generic[T]):
         """
         A property which is `True` for 1xx status codes, `False` otherwise.
         """
-        return codes.is_informational(self.status_code)
+        return codes.is_informational(int(self.status_code))
 
     @property
     def is_success(self) -> bool:
         """
         A property which is `True` for 2xx status codes, `False` otherwise.
         """
-        return codes.is_success(self.status_code)
+        return codes.is_success(int(self.status_code))
 
     @property
     def is_redirect(self) -> bool:
@@ -64,28 +65,28 @@ class Response(Generic[T]):
         Use `response.has_redirect_location` to determine responses with a properly
         formed URL redirection.
         """
-        return codes.is_redirect(self.status_code)
+        return codes.is_redirect(int(self.status_code))
 
     @property
     def is_client_error(self) -> bool:
         """
         A property which is `True` for 4xx status codes, `False` otherwise.
         """
-        return codes.is_client_error(self.status_code)
+        return codes.is_client_error(int(self.status_code))
 
     @property
     def is_server_error(self) -> bool:
         """
         A property which is `True` for 5xx status codes, `False` otherwise.
         """
-        return codes.is_server_error(self.status_code)
+        return codes.is_server_error(int(self.status_code))
 
     @property
     def is_error(self) -> bool:
         """
         A property which is `True` for 4xx and 5xx status codes, `False` otherwise.
         """
-        return codes.is_error(self.status_code)
+        return codes.is_error(int(self.status_code))
 
     @property
     def has_redirect_location(self) -> bool:
@@ -126,10 +127,10 @@ class Response(Generic[T]):
         else:
             reason = self.content
 
-        if 400 <= self.status_code < 500:
+        if 400 <= int(self.status_code) < 500:
             http_error_msg = "%s Client Error: %s" % (self.status_code, reason)
 
-        elif 500 <= self.status_code < 600:
+        elif 500 <= int(self.status_code) < 600:
             http_error_msg = "%s Server Error: %s" % (self.status_code, reason)
 
         if http_error_msg:

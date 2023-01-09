@@ -50,6 +50,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
       required:
       - "documents"
@@ -65,6 +66,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
         text:
           description: "Text to be annotated"
@@ -77,6 +79,13 @@ components:
       additionalProperties: false
       description: "A document annotation"
       properties:
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
+          type: "string"
         end:
           description: "End offset in document"
           format: "int32"
@@ -117,6 +126,13 @@ components:
       additionalProperties: false
       description: "A document category"
       properties:
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
+          type: "string"
         label:
           description: "Human-friendly label"
           type: "string"
@@ -139,6 +155,10 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        altTexts:
+          items:
+            $ref: "#/components/schemas/DocAltText"
+          type: "array"
         annotations:
           items:
             $ref: "#/components/schemas/AnnotatedDocAnnotation"
@@ -153,10 +173,6 @@ components:
         metadata:
           description: "document metadata"
           type: "object"
-        altTexts:
-          items:
-            $ref: "#/components/schemas/DocAltText"
-          type: "array"
         sentences:
           items:
             $ref: "#/components/schemas/DocSentence"
@@ -179,6 +195,13 @@ components:
       additionalProperties: false
       description: "A document annotation"
       properties:
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
+          type: "string"
         documentIdentifier:
           description: "The document identifier"
           type: "string"
@@ -270,6 +293,19 @@ components:
       - "suggestionCount"
       - "suggestionFacets"
       type: "object"
+    AnnotationPatch:
+      additionalProperties: false
+      description: ""
+      properties:
+        status:
+          description: "Status of the category"
+          enum:
+          - "OK"
+          - "KO"
+          type: "string"
+      required:
+      - "status"
+      type: "object"
     AnnotationPlan:
       additionalProperties: false
       description: ""
@@ -284,15 +320,16 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
       required:
       - "pipeline"
       type: "object"
-    AnnotationStatus:
-      additionalProperties: false
-      description: ""
-      properties: {}
-      type: "object"
+#    AnnotationStatus:
+#      additionalProperties: false
+#      description: ""
+#      properties: {}
+#      type: "object"
     AnnotationTerm:
       additionalProperties: false
       description: "A term"
@@ -338,6 +375,7 @@ components:
           type: "string"
       required:
       - "engine"
+      - "favorite"
       - "label"
       - "name"
       type: "object"
@@ -347,6 +385,16 @@ components:
           $ref: "#/components/schemas/Annotator"
         type: "array"
       description: ""
+      type: "object"
+    ApplyTo:
+      additionalProperties: false
+      description: ""
+      properties:
+        path:
+          description: ""
+          type: "string"
+      required:
+      - "path"
       type: "object"
     BearerToken:
       additionalProperties: false
@@ -377,6 +425,266 @@ components:
       - "doc_count"
       - "key"
       type: "object"
+    Campaign:
+      additionalProperties: false
+      description: ""
+      properties:
+        emailNotifications:
+          $ref: "#/components/schemas/EmailNotifications"
+        id:
+          description: ""
+          type: "string"
+        label:
+          description: ""
+          type: "string"
+        overviewMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        sessionModes:
+          items:
+            $ref: "#/components/schemas/CampaignSessionMode"
+          type: "array"
+        sessions:
+          items:
+            $ref: "#/components/schemas/CampaignSession"
+          type: "array"
+        stopMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        userGroups:
+          items:
+            $ref: "#/components/schemas/CampaignUserGroup"
+          type: "array"
+        userSessions:
+          items:
+            $ref: "#/components/schemas/CampaignUserSession"
+          type: "array"
+        welcomeMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+      required:
+      - "id"
+      - "label"
+      - "overviewMessages"
+      - "stopMessages"
+      - "welcomeMessages"
+      type: "object"
+    CampaignArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/Campaign"
+      type: "array"
+    CampaignId:
+      additionalProperties: false
+      description: ""
+      properties:
+        id:
+          description: ""
+          type: "string"
+      required:
+      - "id"
+      type: "object"
+    CampaignPatch:
+      additionalProperties: false
+      description: ""
+      properties:
+        emailNotifications:
+          $ref: "#/components/schemas/EmailNotifications"
+        label:
+          description: ""
+          type: "string"
+        overviewMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        sessionModes:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/CampaignSessionMode"
+            - $ref: "#/components/schemas/NewCampaignSessionMode"
+          type: "array"
+        sessions:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/CampaignSession"
+            - $ref: "#/components/schemas/NewCampaignSession"
+          type: "array"
+        stopMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        userGroups:
+          items:
+            $ref: "#/components/schemas/CampaignUserGroup"
+          type: "array"
+        userSessions:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/CampaignUserSession"
+            - $ref: "#/components/schemas/NewCampaignUserSession"
+          type: "array"
+        welcomeMessages:
+          items:
+            description: ""
+            oneOf:
+            - $ref: "#/components/schemas/MessageId"
+            - $ref: "#/components/schemas/Message"
+            - $ref: "#/components/schemas/NewMessage"
+          type: "array"
+      type: "object"
+    CampaignRolesChange:
+      additionalProperties: false
+      description: ""
+      properties:
+        addedRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        removeCurrentFuntionalRoles:
+          description: ""
+          type: "boolean"
+        removedRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        username:
+          description: ""
+          type: "string"
+      required:
+      - "addedRoles"
+      - "removeCurrentFuntionalRoles"
+      - "removedRoles"
+      - "username"
+      type: "object"
+    CampaignSession:
+      additionalProperties: false
+      description: ""
+      properties:
+        duration:
+          description: ""
+          format: "int32"
+          type: "integer"
+        id:
+          description: ""
+          type: "string"
+        label:
+          description: ""
+          type: "string"
+        reconciliationUsername:
+          description: ""
+          type: "string"
+        splitSize:
+          description: ""
+          type: "number"
+      required:
+      - "duration"
+      - "id"
+      - "label"
+      - "splitSize"
+      type: "object"
+    CampaignSessionMode:
+      additionalProperties: false
+      description: ""
+      properties:
+        id:
+          description: ""
+          type: "string"
+        label:
+          description: ""
+          type: "string"
+        openFunctionalRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        startedFunctionalRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "id"
+      - "label"
+      type: "object"
+    CampaignUserGroup:
+      additionalProperties: false
+      description: ""
+      properties:
+        label:
+          description: ""
+          type: "string"
+        users:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "label"
+      - "users"
+      type: "object"
+    CampaignUserSession:
+      additionalProperties: false
+      description: ""
+      properties:
+        id:
+          description: ""
+          type: "string"
+        sessionId:
+          description: ""
+          type: "string"
+        sessionModeId:
+          description: ""
+          type: "string"
+        state:
+          description: ""
+          enum:
+          - "NOT_EXISTS"
+          - "NEW"
+          - "OPEN"
+          - "STARTED"
+          - "PAUSED"
+          - "STOPPED"
+          - "CLOSED"
+          - "SAME"
+          type: "string"
+        username:
+          description: ""
+          type: "string"
+      required:
+      - "id"
+      - "sessionId"
+      - "sessionModeId"
+      - "state"
+      - "username"
+      type: "object"
     CategoriesFacets:
       additionalProperties: false
       description: ""
@@ -392,6 +700,13 @@ components:
       additionalProperties: false
       description: "A document category"
       properties:
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
+          type: "string"
         documentIdentifier:
           description: "identifier of the document"
           type: "string"
@@ -409,6 +724,20 @@ components:
           type: "string"
       required:
       - "documentIdentifier"
+      - "labelName"
+      type: "object"
+    CategoryAction:
+      additionalProperties: false
+      description: ""
+      properties:
+        add:
+          description: "add or remove"
+          type: "boolean"
+        labelName:
+          description: "category label name"
+          type: "string"
+      required:
+      - "add"
       - "labelName"
       type: "object"
     CategoryId:
@@ -443,6 +772,19 @@ components:
       - "documentFacets"
       - "documentsInDataset"
       type: "object"
+    CategoryPatch:
+      additionalProperties: false
+      description: ""
+      properties:
+        status:
+          description: "Status of the category"
+          enum:
+          - "OK"
+          - "KO"
+          type: "string"
+      required:
+      - "status"
+      type: "object"
     ClassificationConfig:
       additionalProperties: false
       description: ""
@@ -468,6 +810,9 @@ components:
       properties:
         classification:
           $ref: "#/components/schemas/ClassificationOptions"
+        collaborativeAnnotation:
+          description: ""
+          type: "boolean"
         image:
           description: ""
           type: "string"
@@ -492,6 +837,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
       required:
       - "converter"
@@ -511,6 +857,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
       required:
       - "converter"
@@ -574,6 +921,11 @@ components:
       items:
         $ref: "#/components/schemas/CreatedByCount"
       type: "array"
+    CreationMode:
+      additionalProperties: false
+      description: ""
+      properties: {}
+      type: "object"
     Credentials:
       additionalProperties: false
       description: ""
@@ -617,6 +969,32 @@ components:
       required:
       - "removedCount"
       type: "object"
+    DependsOn:
+      additionalProperties: false
+      description: ""
+      properties:
+        auto:
+          description: ""
+          type: "boolean"
+        groups:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        hint:
+          description: ""
+          type: "string"
+        steps:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "auto"
+      - "groups"
+      - "hint"
+      - "steps"
+      type: "object"
     DocAltText:
       additionalProperties: false
       description: "A document alternative text"
@@ -649,6 +1027,13 @@ components:
           type: "string"
         createdDate:
           description: "Creation date"
+          type: "string"
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
           type: "string"
         end:
           description: "End offset in document"
@@ -692,6 +1077,13 @@ components:
         createdDate:
           description: "Creation date"
           type: "string"
+        creationMode:
+          description: "Creation mode"
+          enum:
+          - "manual"
+          - "automatic"
+          - "undefined"
+          type: "string"
         identifier:
           description: "Category identifier"
           type: "string"
@@ -718,10 +1110,17 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        categories:
+          items:
+            $ref: "#/components/schemas/DocCategory"
+          type: "array"
         end:
           description: ""
           format: "int32"
           type: "integer"
+        metadata:
+          description: ""
+          type: "object"
         start:
           description: ""
           format: "int32"
@@ -834,6 +1233,21 @@ components:
       - "hits"
       - "total"
       type: "object"
+    EmailNotifications:
+      additionalProperties: false
+      description: ""
+      properties:
+        enabled:
+          description: ""
+          type: "boolean"
+        notifiedUsers:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "enabled"
+      type: "object"
     EngineConfig:
       additionalProperties: false
       description: ""
@@ -895,10 +1309,18 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        classes:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         duration:
           description: ""
           format: "int64"
           type: "integer"
+        emailNotification:
+          description: ""
+          type: "boolean"
         engine:
           description: ""
           type: "string"
@@ -927,6 +1349,11 @@ components:
         running:
           description: ""
           type: "boolean"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         timestamp:
           description: ""
           format: "int64"
@@ -955,6 +1382,9 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        emailNotification:
+          description: ""
+          type: "boolean"
         favorite:
           description: ""
           type: "boolean"
@@ -964,6 +1394,11 @@ components:
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       type: "object"
     FormatBinaryForm:
       additionalProperties: false
@@ -992,6 +1427,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
       required:
       - "documents"
@@ -1010,6 +1446,7 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
+            - $ref: "#/components/schemas/WithSentencizer"
           type: "array"
         text:
           description: ""
@@ -1040,9 +1477,15 @@ components:
           description: ""
           format: "int64"
           type: "integer"
+        emailNotification:
+          description: ""
+          type: "boolean"
         engine:
           description: ""
           type: "string"
+        favorite:
+          description: ""
+          type: "boolean"
         label:
           description: ""
           type: "string"
@@ -1059,6 +1502,11 @@ components:
         running:
           description: ""
           type: "boolean"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         timestamp:
           description: ""
           format: "int64"
@@ -1086,12 +1534,23 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        emailNotification:
+          description: ""
+          type: "boolean"
+        favorite:
+          description: ""
+          type: "boolean"
         label:
           description: ""
           type: "string"
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       type: "object"
     GeneratedLabelHint:
       additionalProperties: false
@@ -1281,6 +1740,10 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        altTexts:
+          items:
+            $ref: "#/components/schemas/DocAltText"
+          type: "array"
         annotations:
           items:
             $ref: "#/components/schemas/DocAnnotation"
@@ -1295,10 +1758,6 @@ components:
         metadata:
           description: "document metadata"
           type: "object"
-        altTexts:
-          items:
-            $ref: "#/components/schemas/DocAltText"
-          type: "array"
         sentences:
           items:
             $ref: "#/components/schemas/DocSentence"
@@ -1354,6 +1813,9 @@ components:
         label:
           description: ""
           type: "string"
+        labelSetName:
+          description: ""
+          type: "string"
         name:
           description: ""
           type: "string"
@@ -1381,6 +1843,62 @@ components:
       required:
       - "_id"
       - "count"
+      type: "object"
+    LabelNames:
+      additionalProperties: false
+      description: ""
+      properties:
+        names:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      type: "object"
+    LabelSet:
+      additionalProperties: false
+      description: ""
+      properties:
+        createdAt:
+          description: ""
+          type: "string"
+        createdBy:
+          description: ""
+          type: "string"
+        exclusiveClasses:
+          default: false
+          description: ""
+          type: "boolean"
+        label:
+          description: ""
+          type: "string"
+        modifiedAt:
+          description: ""
+          type: "string"
+        name:
+          description: ""
+          type: "string"
+        nature:
+          description: ""
+          type: "string"
+      type: "object"
+    LabelSetArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/LabelSet"
+      type: "array"
+    LabelSetUpdate:
+      additionalProperties: false
+      description: ""
+      properties:
+        exclusiveClasses:
+          description: ""
+          type: "boolean"
+        label:
+          description: ""
+          type: "string"
+        nature:
+          description: ""
+          type: "string"
       type: "object"
     LabelUpdate:
       additionalProperties: false
@@ -1449,6 +1967,90 @@ components:
         label:
           description: ""
           type: "string"
+      type: "object"
+    LocalizedMessage:
+      additionalProperties: false
+      description: ""
+      properties:
+        body:
+          description: ""
+          type: "string"
+        title:
+          description: ""
+          type: "string"
+      required:
+      - "body"
+      - "title"
+      type: "object"
+    Message:
+      additionalProperties: false
+      description: ""
+      properties:
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        index:
+          description: ""
+          format: "int32"
+          type: "integer"
+        localized:
+          additionalProperties:
+            $ref: "#/components/schemas/LocalizedMessage"
+          type: "object"
+        mark:
+          $ref: "#/components/schemas/MessageMark"
+      required:
+      - "id"
+      - "localized"
+      type: "object"
+    MessageArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/Message"
+      type: "array"
+    MessageId:
+      additionalProperties: false
+      description: ""
+      properties:
+        id:
+          description: ""
+          type: "string"
+      required:
+      - "id"
+      type: "object"
+    MessageMark:
+      additionalProperties: false
+      description: ""
+      properties:
+        read:
+          description: ""
+          type: "boolean"
+      required:
+      - "read"
+      type: "object"
+    MessagePatch:
+      additionalProperties: false
+      description: ""
+      properties:
+        group:
+          description: ""
+          type: "string"
+        index:
+          description: ""
+          format: "int32"
+          type: "integer"
+        localized:
+          additionalProperties:
+            $ref: "#/components/schemas/LocalizedMessage"
+          type: "object"
+        scope:
+          description: ""
+          type: "string"
+      required:
+      - "localized"
       type: "object"
     MetadataCount:
       additionalProperties: false
@@ -1604,6 +2206,11 @@ components:
           type: "string"
         parameters:
           $ref: "#/components/schemas/AnnotationPlan"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       required:
       - "label"
       - "name"
@@ -1614,10 +2221,109 @@ components:
       items:
         $ref: "#/components/schemas/NamedAnnotationPlan"
       type: "array"
+    NewCampaign:
+      additionalProperties: false
+      description: ""
+      properties:
+        emailNotifications:
+          $ref: "#/components/schemas/EmailNotifications"
+        label:
+          description: ""
+          type: "string"
+        overviewMessages:
+          items:
+            $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        sessionModes:
+          items:
+            $ref: "#/components/schemas/NewCampaignSessionMode"
+          type: "array"
+        sessions:
+          items:
+            $ref: "#/components/schemas/NewCampaignSession"
+          type: "array"
+        stopMessages:
+          items:
+            $ref: "#/components/schemas/NewMessage"
+          type: "array"
+        userGroups:
+          items:
+            $ref: "#/components/schemas/CampaignUserGroup"
+          type: "array"
+        welcomeMessages:
+          items:
+            $ref: "#/components/schemas/NewMessage"
+          type: "array"
+      required:
+      - "label"
+      type: "object"
+    NewCampaignSession:
+      additionalProperties: false
+      description: ""
+      properties:
+        duration:
+          description: ""
+          format: "int32"
+          type: "integer"
+        label:
+          description: ""
+          type: "string"
+        reconciliationUsername:
+          description: ""
+          type: "string"
+        splitSize:
+          description: ""
+          type: "number"
+      required:
+      - "duration"
+      - "label"
+      - "splitSize"
+      type: "object"
+    NewCampaignSessionMode:
+      additionalProperties: false
+      description: ""
+      properties:
+        label:
+          description: ""
+          type: "string"
+        openFunctionalRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        startedFunctionalRoles:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "label"
+      type: "object"
+    NewCampaignUserSession:
+      additionalProperties: false
+      description: ""
+      properties:
+        sessionId:
+          description: ""
+          type: "string"
+        sessionModeId:
+          description: ""
+          type: "string"
+        username:
+          description: ""
+          type: "string"
+      required:
+      - "sessionId"
+      - "sessionModeId"
+      - "username"
+      type: "object"
     NewExperiment:
       additionalProperties: false
       description: ""
       properties:
+        emailNotification:
+          description: ""
+          type: "boolean"
         engine:
           description: ""
           type: "string"
@@ -1627,6 +2333,11 @@ components:
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       required:
       - "engine"
       - "label"
@@ -1636,6 +2347,9 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        emailNotification:
+          description: ""
+          type: "boolean"
         engine:
           description: ""
           type: "string"
@@ -1645,6 +2359,11 @@ components:
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       required:
       - "engine"
       - "label"
@@ -1669,6 +2388,27 @@ components:
       required:
       - "label"
       type: "object"
+    NewMessage:
+      additionalProperties: false
+      description: ""
+      properties:
+        group:
+          description: ""
+          type: "string"
+        index:
+          description: ""
+          format: "int32"
+          type: "integer"
+        localized:
+          additionalProperties:
+            $ref: "#/components/schemas/LocalizedMessage"
+          type: "object"
+        scope:
+          description: ""
+          type: "string"
+      required:
+      - "localized"
+      type: "object"
     NewNamedAnnotationPlan:
       additionalProperties: false
       description: ""
@@ -1678,6 +2418,11 @@ components:
           type: "string"
         parameters:
           $ref: "#/components/schemas/AnnotationPlan"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       required:
       - "label"
       - "parameters"
@@ -1711,6 +2456,11 @@ components:
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       required:
       - "engine"
       - "label"
@@ -1745,6 +2495,20 @@ components:
       - "roles"
       - "username"
       type: "object"
+    NextStep:
+      additionalProperties: false
+      description: ""
+      properties:
+        hint:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+      required:
+      - "hint"
+      - "id"
+      type: "object"
     OperationCount:
       additionalProperties: false
       description: "Annotation creation response"
@@ -1775,6 +2539,9 @@ components:
           description: ""
           type: "string"
         label:
+          description: ""
+          type: "string"
+        labelSetName:
           description: ""
           type: "string"
         name:
@@ -1809,6 +2576,37 @@ components:
           type: "string"
         parameters:
           $ref: "#/components/schemas/AnnotationPlan"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      type: "object"
+    ProjectAnnotators:
+      additionalProperties: false
+      description: ""
+      properties:
+        gazetteer:
+          items:
+            $ref: "#/components/schemas/Annotator"
+          type: "array"
+        learner:
+          items:
+            $ref: "#/components/schemas/Annotator"
+          type: "array"
+        plan:
+          items:
+            $ref: "#/components/schemas/Annotator"
+          type: "array"
+        suggester:
+          items:
+            $ref: "#/components/schemas/Annotator"
+          type: "array"
+      required:
+      - "gazetteer"
+      - "learner"
+      - "plan"
+      - "suggester"
       type: "object"
     ProjectBean:
       additionalProperties: false
@@ -1829,6 +2627,11 @@ components:
           type: "integer"
         classification:
           $ref: "#/components/schemas/ClassificationConfig"
+        components:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         createdBy:
           description: ""
           type: "string"
@@ -1838,6 +2641,11 @@ components:
         description:
           description: ""
           type: "string"
+        devPatches:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         documents:
           description: ""
           format: "int32"
@@ -1850,6 +2658,9 @@ components:
         groupName:
           description: ""
           type: "string"
+        hasSplit:
+          description: ""
+          type: "boolean"
         image:
           description: ""
           type: "string"
@@ -1869,6 +2680,8 @@ components:
         nature:
           description: ""
           type: "string"
+        openSession:
+          $ref: "#/components/schemas/ProjectOpenSession"
         owner:
           description: ""
           type: "string"
@@ -1885,6 +2698,10 @@ components:
         shared:
           description: ""
           type: "boolean"
+        terms:
+          description: ""
+          format: "int32"
+          type: "integer"
         version:
           description: ""
           type: "string"
@@ -1904,6 +2721,9 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        collaborativeAnnotation:
+          description: ""
+          type: "boolean"
         description:
           description: ""
           type: "string"
@@ -1937,6 +2757,50 @@ components:
           description: ""
           type: "object"
       type: "object"
+    ProjectOpenSession:
+      additionalProperties: false
+      description: ""
+      properties:
+        campaignId:
+          description: ""
+          type: "string"
+        duration:
+          description: ""
+          format: "int32"
+          type: "integer"
+        id:
+          description: ""
+          type: "string"
+        label:
+          description: ""
+          type: "string"
+        remainingDuration:
+          description: ""
+          format: "int32"
+          type: "integer"
+        sessionId:
+          description: ""
+          type: "string"
+        state:
+          description: ""
+          enum:
+          - "NOT_EXISTS"
+          - "NEW"
+          - "OPEN"
+          - "STARTED"
+          - "PAUSED"
+          - "STOPPED"
+          - "CLOSED"
+          - "SAME"
+          type: "string"
+      required:
+      - "campaignId"
+      - "duration"
+      - "label"
+      - "remainingDuration"
+      - "sessionId"
+      - "state"
+      type: "object"
     ProjectProperty:
       additionalProperties: false
       description: ""
@@ -1966,6 +2830,24 @@ components:
       description: ""
       items:
         $ref: "#/components/schemas/ProjectStatus"
+      type: "array"
+    ProjectsAnnotators:
+      additionalProperties: false
+      description: ""
+      properties:
+        annotators:
+          $ref: "#/components/schemas/ProjectAnnotators"
+        projectName:
+          description: ""
+          type: "string"
+      required:
+      - "annotators"
+      - "projectName"
+      type: "object"
+    ProjectsAnnotatorsArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/ProjectsAnnotators"
       type: "array"
     QualityFigures:
       additionalProperties: false
@@ -2106,6 +2988,10 @@ components:
           items:
             $ref: "#/components/schemas/DocAnnotation"
           type: "array"
+        categories:
+          items:
+            $ref: "#/components/schemas/DocCategory"
+          type: "array"
         createdBy:
           description: "User having created the segment"
           type: "string"
@@ -2222,6 +3108,29 @@ components:
       - "hits"
       - "total"
       type: "object"
+    SessionCorpusPermissionChange:
+      additionalProperties: false
+      description: ""
+      properties:
+        add:
+          description: ""
+          type: "boolean"
+        projectName:
+          description: ""
+          type: "string"
+        sessionLabel:
+          description: ""
+          type: "string"
+        usernames:
+          items:
+            description: ""
+          type: "array"
+      required:
+      - "add"
+      - "projectName"
+      - "sessionLabel"
+      - "usernames"
+      type: "object"
     ShareMode:
       additionalProperties: false
       description: ""
@@ -2288,9 +3197,10 @@ components:
           enum:
           - "DOC_IMPORT"
           - "EXPERIMENT_TRAINING"
-          - "DOC_DELETION"
+          - "DELETE_DOCS"
           - "CORPUS_ANNOTATE"
           - "TRAIN_AND_SUGGEST"
+          - "ADD_METADATA"
           - "UNSPECIFIED"
           - "PROJECT_INDEXING"
           - "PROJECTS_INDEXING"
@@ -2299,6 +3209,9 @@ components:
           - "PROCESS_CANDIDATES"
           - "SYNCHRONIZE_TERMS"
           - "TERM_IMPORT"
+          - "SPLIT_CORPUS"
+          - "BACKUP_USER_SESSION"
+          - "ADD_CATEGORY"
           type: "string"
         uploadIds:
           items:
@@ -2328,13 +3241,14 @@ components:
       description: ""
       properties:
         name:
-          description: ""
+          description: "name of the metadata"
           type: "string"
         value:
-          description: ""
+          description: "value of the metadata: leave empty or null to remove the metadata"
           type: "string"
       required:
       - "name"
+      - "value"
       type: "object"
     Suggester:
       additionalProperties: false
@@ -2367,6 +3281,11 @@ components:
         running:
           description: ""
           type: "boolean"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
         timestamp:
           description: ""
           format: "int64"
@@ -2401,6 +3320,11 @@ components:
         parameters:
           description: ""
           type: "object"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       type: "object"
     SuggestionFacets:
       additionalProperties: false
@@ -2626,6 +3550,16 @@ components:
       items:
         $ref: "#/components/schemas/UserResponse"
       type: "array"
+    UserSessionState:
+      additionalProperties: false
+      description: ""
+      properties:
+        $enum$name:
+          description: ""
+          type: "boolean"
+      required:
+      - "$enum$name"
+      type: "object"
     WithAnnotator:
       additionalProperties: false
       description: ""
@@ -2633,12 +3567,26 @@ components:
         annotator:
           description: ""
           type: "string"
+        applyTo:
+          $ref: "#/components/schemas/ApplyTo"
         condition:
           description: ""
           type: "object"
+        dependsOn:
+          $ref: "#/components/schemas/DependsOn"
         disabled:
           description: ""
           type: "boolean"
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        nextSteps:
+          items:
+            $ref: "#/components/schemas/NextStep"
+          type: "array"
         parameters:
           description: ""
           type: "object"
@@ -2655,9 +3603,21 @@ components:
         condition:
           description: ""
           type: "object"
+        dependsOn:
+          $ref: "#/components/schemas/DependsOn"
         disabled:
           description: ""
           type: "boolean"
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        nextSteps:
+          items:
+            $ref: "#/components/schemas/NextStep"
+          type: "array"
         parameters:
           description: ""
           type: "object"
@@ -2666,6 +3626,42 @@ components:
           type: "string"
       required:
       - "processor"
+      type: "object"
+    WithSentencizer:
+      additionalProperties: false
+      description: ""
+      properties:
+        applyTo:
+          $ref: "#/components/schemas/ApplyTo"
+        condition:
+          description: ""
+          type: "object"
+        dependsOn:
+          $ref: "#/components/schemas/DependsOn"
+        disabled:
+          description: ""
+          type: "boolean"
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        nextSteps:
+          items:
+            $ref: "#/components/schemas/NextStep"
+          type: "array"
+        parameters:
+          description: ""
+          type: "object"
+        projectName:
+          description: ""
+          type: "string"
+        sentencizer:
+          description: ""
+          type: "string"
+      required:
+      - "sentencizer"
       type: "object"
   securitySchemes:
     basicAuth:
@@ -3923,6 +4919,34 @@ paths:
       summary: "create a project from an already uploaded archive"
       tags:
       - "projects"
+  /projects/_register:
+    post:
+      operationId: "registerProject"
+      parameters:
+      - description: "coma-separated database names"
+        explode: true
+        in: "query"
+        name: "databases"
+        required: true
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SherpaJobBean"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "register existing databases as projects"
+      tags:
+      - "projects"
   /projects/_reindex:
     post:
       operationId: "reindexProjects"
@@ -4020,6 +5044,25 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "undeploy a running project"
+      tags:
+      - "projects"
+  /projects/annotators_by_type:
+    get:
+      operationId: "getAllAnnotatorsByType"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectsAnnotatorsArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "List available annotators by type for each projects"
       tags:
       - "projects"
   /projects/{projectName}:
@@ -4820,7 +5863,7 @@ paths:
       summary: "Get annotations count per creators"
       tags:
       - "annotations"
-  /projects/{projectName}/annotations/{annotid}:
+  /projects/{projectName}/annotations/{annotationId}:
     delete:
       operationId: "deleteAnnotation"
       parameters:
@@ -4835,7 +5878,7 @@ paths:
       - description: "String identifier of the annotation"
         explode: false
         in: "path"
-        name: "annotid"
+        name: "annotationId"
         required: true
         schema:
           type: "string"
@@ -4856,6 +5899,50 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Delete an annotation"
+      tags:
+      - "annotations"
+    patch:
+      operationId: "updateAnnotation"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "identifier of the annotation to update"
+        explode: false
+        in: "path"
+        name: "annotationId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: "#/components/schemas/AnnotationPatch"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Partially update an annotation"
       tags:
       - "annotations"
   /projects/{projectName}/annotators/{annotator}/_annotate:
@@ -5124,6 +6211,15 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "useCache"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       responses:
         "200":
           content:
@@ -5140,6 +6236,419 @@ paths:
       summary: "List annotators by type"
       tags:
       - "annotators"
+  /projects/{projectName}/campaigns:
+    get:
+      operationId: "getCampaigns"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineMessages"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineUserSessionEvents"
+        required: false
+        schema:
+          default: "none"
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get annotation campaigns of the project"
+      tags:
+      - "campaigns"
+    post:
+      operationId: "createCampaign"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewCampaign"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CampaignId"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Create a campaign"
+      tags:
+      - "campaigns"
+  /projects/{projectName}/campaigns/{campaignId}:
+    delete:
+      operationId: "deleteCampaign"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "delete campaign"
+      tags:
+      - "campaigns"
+    get:
+      operationId: "getCampaign"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineMessages"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineUserSessionEvents"
+        required: false
+        schema:
+          default: "none"
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Campaign"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get campaign"
+      tags:
+      - "campaigns"
+    patch:
+      operationId: "updateCampaign"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "allowImplicitUserSessionDeletion"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: "#/components/schemas/CampaignPatch"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Partially update a campaign"
+      tags:
+      - "campaigns"
+  /projects/{projectName}/campaigns/{campaignId}/_export_user_session:
+    post:
+      operationId: "exportUserSession"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "userSessionId"
+        required: true
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "sessionLabel"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "username"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/zip:
+              schema:
+                format: "binary"
+                type: "string"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "export a user session"
+      tags:
+      - "campaigns"
+  /projects/{projectName}/campaigns/{campaignId}/_split_corpus:
+    post:
+      operationId: "splitCampaignCorpus"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "targetCreatedBy"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SherpaJobBean"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Split corpus according to session definitions"
+      tags:
+      - "campaigns"
+  /projects/{projectName}/campaigns/{campaignId}/_user_session_action:
+    post:
+      operationId: "userSessionAction"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "campaignId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "userSessionId"
+        required: true
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "action"
+        required: true
+        schema:
+          enum:
+          - "create"
+          - "open"
+          - "start"
+          - "pause"
+          - "stop"
+          - "close"
+          - "add_extra_time"
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "actionValue"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Perform an action on a user session"
+      tags:
+      - "campaigns"
   /projects/{projectName}/categories:
     post:
       operationId: "createDocumentCategory"
@@ -5311,7 +6820,7 @@ paths:
         schema:
           type: "string"
         style: "simple"
-      - description: "label of the category to remove"
+      - description: "identifier of the category to remove"
         explode: false
         in: "path"
         name: "categoryId"
@@ -5335,6 +6844,50 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Delete a document category"
+      tags:
+      - "categories"
+    patch:
+      operationId: "updateCategory"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "identifier of the category to update"
+        explode: false
+        in: "path"
+        name: "categoryId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: "#/components/schemas/CategoryPatch"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Partially update a document category"
       tags:
       - "categories"
   /projects/{projectName}/categoriesMetrics:
@@ -5881,6 +7434,91 @@ paths:
       summary: "Search for documents"
       tags:
       - "documents"
+  /projects/{projectName}/documents/_search_and_categorize:
+    post:
+      operationId: "searchAndCategorizeDocuments"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "the text query"
+        explode: true
+        in: "query"
+        name: "query"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "an optional lucene query string to filter on, i.e: '+annotations:*'"
+        explode: true
+        in: "query"
+        name: "queryFilter"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "use the simple query syntax that is more user-friendly. If set\
+          \ to false, the full lucene syntax will be used, but syntax error could\
+          \ occurs (for advanced users only)"
+        explode: true
+        in: "query"
+        name: "simpleQuery"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "an optional comma-separated list of 'facet:value' to filter\
+          \ on, i.e: 'source:nytimes,tag:polictics'"
+        explode: true
+        in: "query"
+        name: "selectedFacets"
+        required: false
+        schema:
+          items:
+            default: ""
+            type: "string"
+          type: "array"
+        style: "form"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryAction"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SherpaJobBean"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Search for documents and add/remove a category to/from all of them"
+      tags:
+      - "documents"
   /projects/{projectName}/documents/_search_and_delete:
     post:
       operationId: "searchAndDeleteDocuments"
@@ -6119,7 +7757,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Search for documents and set a metadata value on them"
+      summary: "Search for documents and add/remove a metadata to/from all of them"
       tags:
       - "documents"
   /projects/{projectName}/documents/_tag:
@@ -6429,6 +8067,14 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "coma-separated tags to filter experiments"
+        explode: true
+        in: "query"
+        name: "tags"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       responses:
         "200":
           content:
@@ -6686,6 +8332,15 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "once training is complete, annotate the corpus with the model"
+        explode: true
+        in: "query"
+        name: "annotateCorpus"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       responses:
         "200":
           content:
@@ -6751,6 +8406,14 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "coma-separated tags to filter gazetteers"
+        explode: true
+        in: "query"
+        name: "tags"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       responses:
         "200":
           content:
@@ -7155,6 +8818,16 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "once synchronization is complete, annotate the corpus with the\
+          \ model"
+        explode: true
+        in: "query"
+        name: "annotateCorpus"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       responses:
         "200":
           content:
@@ -7170,7 +8843,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Launch a synchronize"
+      summary: "Build the gazetteer model from the lexicon"
       tags:
       - "gazetteers"
   /projects/{projectName}/job:
@@ -7369,7 +9042,258 @@ paths:
       summary: "Get current jobs"
       tags:
       - "jobs"
+  /projects/{projectName}/label_sets:
+    get:
+      operationId: "getLabelSets"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "also include labels"
+        explode: true
+        in: "query"
+        name: "includeLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "compute occurrence count for each label?"
+        explode: true
+        in: "query"
+        name: "includeLabelsCount"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelSetArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get list of labelSet"
+      tags:
+      - "labels"
+    post:
+      operationId: "createLabelSet"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabelSet"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelSet"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Create a labelSet"
+      tags:
+      - "labels"
+  /projects/{projectName}/label_sets/{name}:
+    delete:
+      operationId: "deleteLabelSet"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "name"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Delete a label set (and all its label and annotations associated with)"
+      tags:
+      - "labels"
+    get:
+      operationId: "getLabelSet"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "name"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "also include labels"
+        explode: true
+        in: "query"
+        name: "includeLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "compute occurrence count for each label?"
+        explode: true
+        in: "query"
+        name: "includeLabelsCount"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelSet"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get a labelSet"
+      tags:
+      - "labels"
+    patch:
+      operationId: "updateLabelSet"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "name"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabelSetUpdate"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LabelSet"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Update a labelSet"
+      tags:
+      - "labels"
   /projects/{projectName}/labels:
+    delete:
+      operationId: "deleteLabelByNames"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabelNames"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Remove label by name"
+      tags:
+      - "labels"
     get:
       operationId: "getLabels"
       parameters:
@@ -7389,6 +9313,14 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "which label set (could be left empty to get all labels)"
+        explode: true
+        in: "query"
+        name: "labelSetName"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       responses:
         "200":
@@ -7478,7 +9410,7 @@ paths:
       summary: "Remove label by name"
       tags:
       - "labels"
-    put:
+    patch:
       operationId: "updateLabel"
       parameters:
       - description: "project name"
@@ -7518,6 +9450,49 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Update a label"
+      tags:
+      - "labels"
+    put:
+      deprecated: true
+      operationId: "updateLabelPut"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "labelName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LabelUpdate"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Update a label (Please use PATCH instead of PUT)"
       tags:
       - "labels"
   /projects/{projectName}/lexicons:
@@ -7920,6 +9895,279 @@ paths:
       summary: "import a term file already uploaded on the server into the project"
       tags:
       - "lexicons"
+  /projects/{projectName}/messages:
+    get:
+      operationId: "getProjectMessages"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "group"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "language"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      - description: "if unspecified then all messages are returned, otherwise only\
+          \ messages read/unread by the calling user will be returned"
+        explode: true
+        in: "query"
+        name: "read"
+        required: false
+        schema:
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "scopes"
+        required: false
+        schema:
+          items:
+            enum:
+            - "open_campaign"
+            - "open_session"
+            - "stop_campaign"
+            type: "string"
+          type: "array"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get messages of current user"
+      tags:
+      - "messages"
+    post:
+      operationId: "createProjectMessage"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewMessage"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageId"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Create a message"
+      tags:
+      - "messages"
+  /projects/{projectName}/messages/{messageId}:
+    delete:
+      operationId: "deleteProjectMessage"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "messageId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "delete message"
+      tags:
+      - "messages"
+    get:
+      operationId: "getProjectMessage"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "messageId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get message"
+      tags:
+      - "messages"
+    patch:
+      operationId: "updateProjectMessage"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "messageId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: "#/components/schemas/MessagePatch"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Partially update a message"
+      tags:
+      - "messages"
+  /projects/{projectName}/messages/{messageId}/_mark:
+    post:
+      operationId: "markProjectMessage"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "messageId"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageMark"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ack"
+          description: "(to be documented)"
+        "404":
+          description: "no such element"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Mark a message as read/unread"
+      tags:
+      - "messages"
   /projects/{projectName}/metadata:
     get:
       operationId: "getMetadataDefinition"
@@ -8000,6 +10248,45 @@ paths:
       summary: "delete all known models"
       tags:
       - "models"
+  /projects/{projectName}/models/_generated_label_names:
+    get:
+      operationId: "getGeneratedLabelNames"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "configName"
+        required: true
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: "object"
+                type: "array"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Returns the list of label names generated by the latest model of the\
+        \ configuration"
+      tags:
+      - "models"
   /projects/{projectName}/plans:
     delete:
       operationId: "deletePlans"
@@ -8047,6 +10334,14 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "coma-separated tags to filter plans"
+        explode: true
+        in: "query"
+        name: "tags"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       responses:
         "200":
           content:
@@ -9376,6 +11671,14 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: "coma-separated tags to filter suggesters"
+        explode: true
+        in: "query"
+        name: "tags"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       responses:
         "200":
           content:
