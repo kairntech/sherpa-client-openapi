@@ -813,7 +813,13 @@ components:
         collaborativeAnnotation:
           description: ""
           type: "boolean"
-        image:
+        imageFilename:
+          description: ""
+          type: "string"
+        imageId:
+          description: ""
+          type: "string"
+        imageUrl:
           description: ""
           type: "string"
         label:
@@ -1807,6 +1813,9 @@ components:
           description: ""
           format: "int32"
           type: "integer"
+        guideline:
+          description: ""
+          type: "string"
         identifier:
           description: ""
           type: "string"
@@ -1868,6 +1877,9 @@ components:
           default: false
           description: ""
           type: "boolean"
+        guideline:
+          description: ""
+          type: "string"
         label:
           description: ""
           type: "string"
@@ -1880,6 +1892,11 @@ components:
         nature:
           description: ""
           type: "string"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       type: "object"
     LabelSetArray:
       description: ""
@@ -1893,12 +1910,20 @@ components:
         exclusiveClasses:
           description: ""
           type: "boolean"
+        guideline:
+          description: ""
+          type: "string"
         label:
           description: ""
           type: "string"
         nature:
           description: ""
           type: "string"
+        tags:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
       type: "object"
     LabelUpdate:
       additionalProperties: false
@@ -1907,10 +1932,16 @@ components:
         color:
           description: ""
           type: "string"
+        guideline:
+          description: ""
+          type: "string"
         identifier:
           description: ""
           type: "string"
         label:
+          description: ""
+          type: "string"
+        labelSetName:
           description: ""
           type: "string"
       type: "object"
@@ -2533,6 +2564,9 @@ components:
       description: ""
       properties:
         color:
+          description: ""
+          type: "string"
+        guideline:
           description: ""
           type: "string"
         identifier:
@@ -3342,16 +3376,6 @@ components:
       - "labels"
       - "texts"
       type: "object"
-    Term:
-      additionalProperties: false
-      description: ""
-      properties:
-        identifier:
-          description: ""
-          type: "string"
-      required:
-      - "identifier"
-      type: "object"
     TermHit:
       additionalProperties: false
       description: ""
@@ -3382,6 +3406,16 @@ components:
       required:
       - "hits"
       - "total"
+      type: "object"
+    TermIdentifier:
+      additionalProperties: false
+      description: ""
+      properties:
+        identifier:
+          description: ""
+          type: "string"
+      required:
+      - "identifier"
       type: "object"
     TermImport:
       additionalProperties: false
@@ -3462,6 +3496,9 @@ components:
       additionalProperties: false
       description: ""
       properties:
+        disabled:
+          description: ""
+          type: "boolean"
         permissions:
           items:
             description: ""
@@ -3517,6 +3554,9 @@ components:
         defaultGroup:
           description: ""
           type: "string"
+        disabled:
+          description: ""
+          type: "boolean"
         email:
           description: ""
           type: "string"
@@ -4306,6 +4346,24 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "Returns a token without permissions (to be used as an API key)"
+        explode: true
+        in: "query"
+        name: "noPermissions"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Duration of the token (e.g. \"1 day\" or \"3 hours\" (available\
+          \ units are: seconds, minutes, hours and days)"
+        explode: true
+        in: "query"
+        name: "duration"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       requestBody:
         content:
@@ -6100,7 +6158,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Annotate the whole corpus with the given annotator"
+      summary: "Annotate the corpus with the given annotator"
       tags:
       - "annotate"
   /projects/{projectName}/annotators/{annotator}/_annotate_documents:
@@ -7432,6 +7490,127 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Search for documents"
+      tags:
+      - "documents"
+  /projects/{projectName}/documents/_search_and_annotate:
+    post:
+      operationId: "searchAndAnnotateDocuments"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "the text query"
+        explode: true
+        in: "query"
+        name: "query"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "an optional lucene query string to filter on, i.e: '+annotations:*'"
+        explode: true
+        in: "query"
+        name: "queryFilter"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "use the simple query syntax that is more user-friendly. If set\
+          \ to false, the full lucene syntax will be used, but syntax error could\
+          \ occurs (for advanced users only)"
+        explode: true
+        in: "query"
+        name: "simpleQuery"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: "an optional comma-separated list of 'facet:value' to filter\
+          \ on, i.e: 'source:nytimes,tag:polictics'"
+        explode: true
+        in: "query"
+        name: "selectedFacets"
+        required: false
+        schema:
+          items:
+            default: ""
+            type: "string"
+          type: "array"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "annotatorProject"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "overwrite"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "restrictedOnDatasetSegments"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "emailNotification"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SherpaJobBean"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Search for documents and apply an annotator on them"
       tags:
       - "documents"
   /projects/{projectName}/documents/_search_and_categorize:
@@ -9042,6 +9221,51 @@ paths:
       summary: "Get current jobs"
       tags:
       - "jobs"
+  /projects/{projectName}/label/{labelName}:
+    get:
+      operationId: "getLabel"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "which label to fetch"
+        explode: false
+        in: "path"
+        name: "labelName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: "compute occurrence count for each label?"
+        explode: true
+        in: "query"
+        name: "includeCount"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Label"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get label"
+      tags:
+      - "labels"
   /projects/{projectName}/label_sets:
     get:
       operationId: "getLabelSets"
@@ -9831,7 +10055,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Term"
+              type: "object"
         description: "(to be documented)"
         required: true
       responses:
@@ -9848,6 +10072,45 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Create a new term in the lexicon"
+      tags:
+      - "lexicons"
+  /projects/{projectName}/lexicons/{lexiconName}/_delete_term:
+    post:
+      operationId: "deleteTerm"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "lexiconName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TermIdentifier"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "204":
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Delete a term from a lexicon"
       tags:
       - "lexicons"
   /projects/{projectName}/lexicons/{lexiconName}/_load:
