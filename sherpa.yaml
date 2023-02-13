@@ -367,11 +367,11 @@ components:
       required:
       - "pipeline"
       type: "object"
-    AnnotationStatus:
-      additionalProperties: false
-      description: ""
-      properties: {}
-      type: "object"
+#    AnnotationStatus:
+#      additionalProperties: false
+#      description: ""
+#      properties: {}
+#      type: "object"
     AnnotationTerm:
       additionalProperties: false
       description: "A term"
