@@ -36,7 +36,7 @@ components:
         plan:
           $ref: "#/components/schemas/ConvertAnnotationPlan"
       type: "object"
-    AnnotateDocumentsWithMany:
+    AnnotateDocumentsWithPipeline:
       additionalProperties: false
       description: ""
       properties:
@@ -50,13 +50,14 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
       required:
       - "documents"
       - "pipeline"
       type: "object"
-    AnnotateTextWithMany:
+    AnnotateTextWithPipeline:
       additionalProperties: false
       description: ""
       properties:
@@ -66,13 +67,28 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
         text:
           description: "Text to be annotated"
           type: "string"
       required:
       - "pipeline"
+      - "text"
+      type: "object"
+    AnnotatedDocAltText:
+      additionalProperties: false
+      description: "A document alternative text"
+      properties:
+        name:
+          description: "The alternative text name"
+          type: "string"
+        text:
+          description: "The alternative text"
+          type: "string"
+      required:
+      - "name"
       - "text"
       type: "object"
     AnnotatedDocAnnotation:
@@ -151,13 +167,36 @@ components:
       required:
       - "labelName"
       type: "object"
+    AnnotatedDocSentence:
+      additionalProperties: false
+      description: ""
+      properties:
+        categories:
+          items:
+            $ref: "#/components/schemas/AnnotatedDocCategory"
+          type: "array"
+        end:
+          description: ""
+          format: "int32"
+          type: "integer"
+        metadata:
+          description: ""
+          type: "object"
+        start:
+          description: ""
+          format: "int32"
+          type: "integer"
+      required:
+      - "end"
+      - "start"
+      type: "object"
     AnnotatedDocument:
       additionalProperties: false
       description: ""
       properties:
         altTexts:
           items:
-            $ref: "#/components/schemas/DocAltText"
+            $ref: "#/components/schemas/AnnotatedDocAltText"
           type: "array"
         annotations:
           items:
@@ -175,7 +214,7 @@ components:
           type: "object"
         sentences:
           items:
-            $ref: "#/components/schemas/DocSentence"
+            $ref: "#/components/schemas/AnnotatedDocSentence"
           type: "array"
         text:
           description: "text of the document"
@@ -320,16 +359,19 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
+        segmenter:
+          $ref: "#/components/schemas/Segmenter"
       required:
       - "pipeline"
       type: "object"
-#    AnnotationStatus:
-#      additionalProperties: false
-#      description: ""
-#      properties: {}
-#      type: "object"
+    AnnotationStatus:
+      additionalProperties: false
+      description: ""
+      properties: {}
+      type: "object"
     AnnotationTerm:
       additionalProperties: false
       description: "A term"
@@ -403,12 +445,12 @@ components:
         access_token:
           description: ""
           type: "string"
-        username:
+        email:
           description: ""
           type: "string"
       required:
       - "access_token"
-      - "username"
+      - "email"
       type: "object"
     Bucket:
       additionalProperties: false
@@ -843,10 +885,12 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
+        segmenter:
+          $ref: "#/components/schemas/Segmenter"
       required:
-      - "converter"
       - "pipeline"
       type: "object"
     ConvertFormatAnnotationPlan:
@@ -863,10 +907,12 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
+        segmenter:
+          $ref: "#/components/schemas/Segmenter"
       required:
-      - "converter"
       - "formatter"
       - "pipeline"
       type: "object"
@@ -1433,7 +1479,8 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
       required:
       - "documents"
@@ -1452,7 +1499,8 @@ components:
             oneOf:
             - $ref: "#/components/schemas/WithAnnotator"
             - $ref: "#/components/schemas/WithProcessor"
-            - $ref: "#/components/schemas/WithSentencizer"
+            - $ref: "#/components/schemas/WithLanguageGuesser"
+            - $ref: "#/components/schemas/WithSegmenter"
           type: "array"
         text:
           description: ""
@@ -1686,6 +1734,9 @@ components:
         functions:
           description: ""
           type: "string"
+        languageGuessers:
+          description: ""
+          type: "string"
         languages:
           description: ""
           type: "string"
@@ -1696,6 +1747,9 @@ components:
           description: ""
           type: "object"
         processors:
+          description: ""
+          type: "string"
+        segmenters:
           description: ""
           type: "string"
         termImporters:
@@ -3142,6 +3196,23 @@ components:
       - "hits"
       - "total"
       type: "object"
+    Segmenter:
+      additionalProperties: false
+      description: ""
+      properties:
+        name:
+          description: "Name of the segmenter (e.g. blingfire) or name of the conversion\
+            \ plan"
+          type: "string"
+        parameters:
+          description: "Optional conversion parameters"
+          type: "object"
+        projectName:
+          description: "If conversion plan, name of the project containing the plan"
+          type: "string"
+      required:
+      - "name"
+      type: "object"
     SessionCorpusPermissionChange:
       additionalProperties: false
       description: ""
@@ -3246,6 +3317,7 @@ components:
           - "SPLIT_CORPUS"
           - "BACKUP_USER_SESSION"
           - "ADD_CATEGORY"
+          - "PROJECT_SEGMENTATION"
           type: "string"
         uploadIds:
           items:
@@ -3636,6 +3708,42 @@ components:
       required:
       - "annotator"
       type: "object"
+    WithLanguageGuesser:
+      additionalProperties: false
+      description: ""
+      properties:
+        applyTo:
+          $ref: "#/components/schemas/ApplyTo"
+        condition:
+          description: ""
+          type: "object"
+        dependsOn:
+          $ref: "#/components/schemas/DependsOn"
+        disabled:
+          description: ""
+          type: "boolean"
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        languageGuesser:
+          description: ""
+          type: "string"
+        nextSteps:
+          items:
+            $ref: "#/components/schemas/NextStep"
+          type: "array"
+        parameters:
+          description: ""
+          type: "object"
+        projectName:
+          description: ""
+          type: "string"
+      required:
+      - "languageGuesser"
+      type: "object"
     WithProcessor:
       additionalProperties: false
       description: ""
@@ -3667,7 +3775,7 @@ components:
       required:
       - "processor"
       type: "object"
-    WithSentencizer:
+    WithSegmenter:
       additionalProperties: false
       description: ""
       properties:
@@ -3697,11 +3805,11 @@ components:
         projectName:
           description: ""
           type: "string"
-        sentencizer:
+        segmenter:
           description: ""
           type: "string"
       required:
-      - "sentencizer"
+      - "segmenter"
       type: "object"
   securitySchemes:
     basicAuth:
@@ -3720,7 +3828,7 @@ openapi: "3.0.0"
 paths:
   /annotate/_annotate_binary:
     post:
-      operationId: "annotateBinary"
+      operationId: "annotateBinaryWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -3766,6 +3874,15 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
@@ -3794,12 +3911,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a binary document with multiple annotators"
+      summary: "annotate a binary document with a pipeline"
       tags:
       - "annotate"
   /annotate/_annotate_documents:
     post:
-      operationId: "annotateDocumentsWithMany"
+      operationId: "annotateDocumentsWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -3846,6 +3963,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -3858,7 +3984,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnnotateDocumentsWithMany"
+              $ref: "#/components/schemas/AnnotateDocumentsWithPipeline"
         description: "(to be documented)"
         required: true
       responses:
@@ -3874,12 +4000,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate documents with many annotators"
+      summary: "annotate documents with a pipeline"
       tags:
       - "annotate"
   /annotate/_annotate_format_binary:
     post:
-      operationId: "annotateFormatBinary"
+      operationId: "annotateFormatBinaryWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -3925,6 +4051,15 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       requestBody:
         content:
@@ -3954,13 +4089,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a binary document with multiple annotators and return a formatted\
+      summary: "annotate a binary document with a pipeline and return a formatted\
         \ result"
       tags:
       - "annotate"
   /annotate/_annotate_format_documents:
     post:
-      operationId: "annotateFormatDocumentsWithMany"
+      operationId: "annotateFormatDocumentsWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -4006,6 +4141,15 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       requestBody:
         content:
@@ -4036,13 +4180,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate documents with multiple annotators and return formatted results\
-        \ in a zip"
+      summary: "annotate documents with a pipeline and return formatted results (generally\
+        \ in a zip)"
       tags:
       - "annotate"
   /annotate/_annotate_format_text:
     post:
-      operationId: "annotateFormatTextWithMany"
+      operationId: "annotateFormatTextWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -4088,6 +4232,15 @@ paths:
         schema:
           default: false
           type: "boolean"
+        style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
         style: "form"
       requestBody:
         content:
@@ -4118,12 +4271,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a text with multiple annotators and return a formatted result"
+      summary: "annotate a text with a pipeline and return a formatted result"
       tags:
       - "annotate"
   /annotate/_annotate_text:
     post:
-      operationId: "annotateTextWithMany"
+      operationId: "annotateTextWithPlan"
       parameters:
       - description: ""
         explode: true
@@ -4170,6 +4323,15 @@ paths:
           default: false
           type: "boolean"
         style: "form"
+      - description: "if a project name is given, default language guesser, segmenters\
+          \ of the project will be used"
+        explode: true
+        in: "query"
+        name: "projectContext"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
       - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
         explode: true
         in: "query"
@@ -4182,7 +4344,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AnnotateTextWithMany"
+              $ref: "#/components/schemas/AnnotateTextWithPipeline"
         description: "(to be documented)"
         required: true
       responses:
@@ -4198,7 +4360,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a text with many annotators"
+      summary: "annotate a text with a pipeline"
       tags:
       - "annotate"
   /annotate/_format_binary:
@@ -4281,6 +4443,770 @@ paths:
           description: "(to be documented)"
       summary: "annotate a binary document with multiple annotators and return a formatted\
         \ result (replaced with _annotate_format_binary)"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/_annotate:
+    post:
+      operationId: "annotateTextWithProject"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: "string"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotatedDocument"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Annotate text with the default annotator of the project"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/_annotate_binary:
+    post:
+      operationId: "annotateBinaryWithProject"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: "binary"
+                  type: "string"
+              type: "object"
+        description: "(to be documented)"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotatedDocumentArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "annotate a binary document with the default annotator of the project"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate:
+    post:
+      operationId: "annotateTextWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: "string"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotatedDocument"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Annotate text with the a project annotator"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate_binary:
+    post:
+      operationId: "annotateBinaryWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: "binary"
+                  type: "string"
+              type: "object"
+        description: "(to be documented)"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotatedDocumentArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "annotate a binary document with a project annotator"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate_documents:
+    post:
+      operationId: "annotateDocumentsWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: "Output fields (e.g. 'annotations,categories' or '!text,!metadata'"
+        explode: true
+        in: "query"
+        name: "outputFields"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InputDocumentArray"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnotatedDocumentArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Annotate documents with a project annotator"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate_format_binary:
+    post:
+      operationId: "annotateFormatBinaryWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: "binary"
+                  type: "string"
+              type: "object"
+        description: "(to be documented)"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "binary"
+                type: "string"
+            application/octet-stream:
+              schema:
+                format: "binary"
+                type: "string"
+            application/xml:
+              schema:
+                format: "binary"
+                type: "string"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "annotate a binary document and return a formatted result"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate_format_documents:
+    post:
+      operationId: "annotateFormatDocumentsWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InputDocumentArray"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "binary"
+                type: "string"
+            application/octet-stream:
+              schema:
+                format: "binary"
+                type: "string"
+            application/xml:
+              schema:
+                format: "binary"
+                type: "string"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "annotate documents and return formatted results in a zip"
+      tags:
+      - "annotate"
+  /annotate/projects/{projectName}/annotators/{annotator}/_annotate_format_text:
+    post:
+      operationId: "annotateFormatTextWithProjectAnnotator"
+      parameters:
+      - description: ""
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: false
+        in: "path"
+        name: "annotator"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabels"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineLabelIds"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "inlineText"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      - description: "do not use in production! completely changes the response format"
+        explode: true
+        in: "query"
+        name: "debug"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "parallelize"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: "string"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: "binary"
+                type: "string"
+            application/octet-stream:
+              schema:
+                format: "binary"
+                type: "string"
+            application/xml:
+              schema:
+                format: "binary"
+                type: "string"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "annotate a text and return a formatted result"
       tags:
       - "annotate"
   /app_state:
@@ -5155,9 +6081,10 @@ paths:
       - "projects"
   /projects/{projectName}/_annotate:
     post:
-      operationId: "annotateText"
+      deprecated: true
+      operationId: "deprecatedAnnotateText"
       parameters:
-      - description: "project name"
+      - description: ""
         explode: false
         in: "path"
         name: "projectName"
@@ -5238,7 +6165,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Annotate text with the last model of the Sherpa suggester"
+      summary: "Annotate text with the default annotator of the project (replaced\
+        \ with /annotate/projects/{projectName}/_annotate)"
       tags:
       - "annotate"
   /projects/{projectName}/_chown:
@@ -6005,9 +6933,10 @@ paths:
       - "annotations"
   /projects/{projectName}/annotators/{annotator}/_annotate:
     post:
-      operationId: "annotateTextWith"
+      deprecated: true
+      operationId: "deprecatedAnnotateTextWith"
       parameters:
-      - description: "project name"
+      - description: ""
         explode: false
         in: "path"
         name: "projectName"
@@ -6096,7 +7025,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Annotate text with the given annotator"
+      summary: "Annotate text with the given annotator (replaced with /annotate/projects/{projectName}/annotators/{annotator}/_annotate)"
       tags:
       - "annotate"
   /projects/{projectName}/annotators/{annotator}/_annotate_corpus:
@@ -6163,9 +7092,10 @@ paths:
       - "annotate"
   /projects/{projectName}/annotators/{annotator}/_annotate_documents:
     post:
-      operationId: "annotateDocumentsWith"
+      deprecated: true
+      operationId: "deprecatedAnnotateDocumentsWith"
       parameters:
-      - description: "project name"
+      - description: ""
         explode: false
         in: "path"
         name: "projectName"
@@ -6254,7 +7184,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "Annotate documents with the given annotator"
+      summary: "Annotate documents with the given annotator (replaced with /annotate/projects/{projectName}/annotators/{annotator}/_annotate_documents)"
       tags:
       - "annotate"
   /projects/{projectName}/annotators_by_type:
@@ -10051,6 +10981,15 @@ paths:
         schema:
           type: "string"
         style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "overwrite"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
       requestBody:
         content:
           application/json:
@@ -10812,7 +11751,8 @@ paths:
       - "plans"
   /projects/{projectName}/plans/{planName}/_annotate_binary:
     post:
-      operationId: "annotateBinaryWithPlanRef"
+      deprecated: true
+      operationId: "deprecatedAnnotateBinaryWithPlanRef"
       parameters:
       - description: ""
         explode: false
@@ -10906,12 +11846,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a binary document with multiple annotators"
+      summary: "annotate a binary document with multiple annotators (replaced with\
+        \ /projects/{projectName}/annotators/{annotator}/_annotate_binary)"
       tags:
       - "annotate"
   /projects/{projectName}/plans/{planName}/_annotate_format_binary:
     post:
-      operationId: "annotateFormatBinaryWithPlanRef"
+      deprecated: true
+      operationId: "deprecatedAnnotateFormatBinaryWithPlanRef"
       parameters:
       - description: ""
         explode: false
@@ -11007,12 +11949,13 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "annotate a binary document with multiple annotators and return a formatted\
-        \ result"
+        \ result (replaced with /projects/{projectName}/annotators/{annotator}/_annotate_format_binary)"
       tags:
       - "annotate"
   /projects/{projectName}/plans/{planName}/_annotate_format_documents:
     post:
-      operationId: "annotateFormatDocumentsWithPlanRef"
+      deprecated: true
+      operationId: "deprecatedAnnotateFormatDocumentsWithPlanRef"
       parameters:
       - description: ""
         explode: false
@@ -11105,12 +12048,13 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "annotate documents with multiple annotators and return formatted results\
-        \ in a zip"
+        \ in a zip (replaced with /projects/{projectName}/annotators/{annotator}/_annotate_format_text)"
       tags:
       - "annotate"
   /projects/{projectName}/plans/{planName}/_annotate_format_text:
     post:
-      operationId: "annotateFormatTextWithPlanRef"
+      deprecated: true
+      operationId: "deprecatedAnnotateFormatTextWithPlanRef"
       parameters:
       - description: ""
         explode: false
@@ -11202,7 +12146,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
-      summary: "annotate a text with multiple annotators and return a formatted result"
+      summary: "annotate a text with multiple annotators and return a formatted result\
+        \ (replaced with /projects/{projectName}/annotators/{annotator}/_annotate_format_text)"
       tags:
       - "annotate"
   /projects/{projectName}/properties:
@@ -11348,6 +12293,34 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "Get segments surrounding a segment"
+      tags:
+      - "segments"
+  /projects/{projectName}/segments/_recompute:
+    post:
+      operationId: "recomputeSegments"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SherpaJobBean"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Re-compute segments"
       tags:
       - "segments"
   /projects/{projectName}/segments/_search:
@@ -12654,6 +13627,24 @@ paths:
           default: ""
           type: "string"
         style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "segmenter"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "languageGuesser"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
       responses:
         "200":
           content:
@@ -12788,6 +13779,24 @@ paths:
         explode: true
         in: "query"
         name: "converter"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "segmenter"
+        required: false
+        schema:
+          default: ""
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "languageGuesser"
         required: false
         schema:
           default: ""
