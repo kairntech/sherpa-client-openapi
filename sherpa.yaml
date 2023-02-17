@@ -417,7 +417,6 @@ components:
           type: "string"
       required:
       - "engine"
-      - "favorite"
       - "label"
       - "name"
       type: "object"
