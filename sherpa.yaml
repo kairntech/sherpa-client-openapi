@@ -449,7 +449,6 @@ components:
           type: "string"
       required:
       - "access_token"
-      - "email"
       type: "object"
     Bucket:
       additionalProperties: false
