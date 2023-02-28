@@ -1153,7 +1153,6 @@ components:
           - "KO"
           type: "string"
       required:
-      - "identifier"
       - "labelName"
       type: "object"
     DocSentence:
@@ -2792,7 +2791,6 @@ components:
           description: ""
           type: "string"
       required:
-      - "description"
       - "image"
       - "label"
       - "lang"
