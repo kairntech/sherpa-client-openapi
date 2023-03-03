@@ -25,6 +25,26 @@ components:
       - "buckets"
       - "name"
       type: "object"
+    AltText:
+      additionalProperties: false
+      description: ""
+      properties:
+        count:
+          description: ""
+          format: "int32"
+          type: "integer"
+        name:
+          description: ""
+          type: "string"
+      required:
+      - "count"
+      - "name"
+      type: "object"
+    AltTextArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/AltText"
+      type: "array"
     AnnotateBinaryForm:
       additionalProperties: false
       description: ""
@@ -52,6 +72,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
       required:
       - "documents"
@@ -69,6 +90,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
         text:
           description: "Text to be annotated"
@@ -361,17 +383,18 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
         segmenter:
           $ref: "#/components/schemas/Segmenter"
       required:
       - "pipeline"
       type: "object"
-#    AnnotationStatus:
-#      additionalProperties: false
-#      description: ""
-#      properties: {}
-#      type: "object"
+    AnnotationStatus:
+      additionalProperties: false
+      description: ""
+      properties: {}
+      type: "object"
     AnnotationTerm:
       additionalProperties: false
       description: "A term"
@@ -449,6 +472,7 @@ components:
           type: "string"
       required:
       - "access_token"
+      - "email"
       type: "object"
     Bucket:
       additionalProperties: false
@@ -885,6 +909,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
         segmenter:
           $ref: "#/components/schemas/Segmenter"
@@ -907,6 +932,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
         segmenter:
           $ref: "#/components/schemas/Segmenter"
@@ -1006,6 +1032,23 @@ components:
       - "removedProjects"
       - "removedUsers"
       type: "object"
+    DeleteManyResponse:
+      additionalProperties: false
+      description: ""
+      properties:
+        details:
+          items:
+            $ref: "#/components/schemas/ItemCount"
+          type: "array"
+        job:
+          $ref: "#/components/schemas/SherpaJobBean"
+        removed:
+          description: ""
+          format: "int32"
+          type: "integer"
+      required:
+      - "removed"
+      type: "object"
     DeleteResponse:
       additionalProperties: false
       description: ""
@@ -1098,6 +1141,9 @@ components:
         modifiedDate:
           description: "Last modification date"
           type: "string"
+        properties:
+          description: "Additional properties"
+          type: "object"
         start:
           description: "Start offset in document"
           format: "int32"
@@ -1108,6 +1154,10 @@ components:
           - "OK"
           - "KO"
           type: "string"
+        terms:
+          items:
+            $ref: "#/components/schemas/AnnotationTerm"
+          type: "array"
         text:
           description: "Covered text"
           type: "string"
@@ -1143,6 +1193,9 @@ components:
         modifiedDate:
           description: "Last modification date"
           type: "string"
+        properties:
+          description: "Additional properties"
+          type: "object"
         score:
           description: "Score of the category"
           type: "number"
@@ -1153,6 +1206,7 @@ components:
           - "KO"
           type: "string"
       required:
+      - "identifier"
       - "labelName"
       type: "object"
     DocSentence:
@@ -1449,6 +1503,36 @@ components:
             type: "string"
           type: "array"
       type: "object"
+    ExternalDatabases:
+      additionalProperties: false
+      description: ""
+      properties:
+        databases:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "databases"
+      type: "object"
+    ExternalResources:
+      additionalProperties: false
+      description: ""
+      properties:
+        databases:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+        indexes:
+          items:
+            description: ""
+            type: "string"
+          type: "array"
+      required:
+      - "databases"
+      - "indexes"
+      type: "object"
     FormatBinaryForm:
       additionalProperties: false
       description: ""
@@ -1478,6 +1562,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
       required:
       - "documents"
@@ -1498,6 +1583,7 @@ components:
             - $ref: "#/components/schemas/WithProcessor"
             - $ref: "#/components/schemas/WithLanguageGuesser"
             - $ref: "#/components/schemas/WithSegmenter"
+            - $ref: "#/components/schemas/WithConverter"
           type: "array"
         text:
           description: ""
@@ -1843,6 +1929,36 @@ components:
       required:
       - "label"
       type: "object"
+    ItemCount:
+      additionalProperties: false
+      description: ""
+      properties:
+        count:
+          description: ""
+          format: "int32"
+          type: "integer"
+        name:
+          description: ""
+          type: "string"
+      required:
+      - "count"
+      - "name"
+      type: "object"
+    ItemRef:
+      additionalProperties: false
+      description: ""
+      properties:
+        name:
+          description: ""
+          type: "string"
+      required:
+      - "name"
+      type: "object"
+    ItemRefArray:
+      description: ""
+      items:
+        $ref: "#/components/schemas/ItemRef"
+      type: "array"
     JobStatus:
       additionalProperties: false
       description: ""
@@ -2791,6 +2907,7 @@ components:
           description: ""
           type: "string"
       required:
+      - "description"
       - "image"
       - "label"
       - "lang"
@@ -3704,6 +3821,42 @@ components:
       required:
       - "annotator"
       type: "object"
+    WithConverter:
+      additionalProperties: false
+      description: ""
+      properties:
+        applyTo:
+          $ref: "#/components/schemas/ApplyTo"
+        condition:
+          description: ""
+          type: "object"
+        converter:
+          description: ""
+          type: "string"
+        dependsOn:
+          $ref: "#/components/schemas/DependsOn"
+        disabled:
+          description: ""
+          type: "boolean"
+        group:
+          description: ""
+          type: "string"
+        id:
+          description: ""
+          type: "string"
+        nextSteps:
+          items:
+            $ref: "#/components/schemas/NextStep"
+          type: "array"
+        parameters:
+          description: ""
+          type: "object"
+        projectName:
+          description: ""
+          type: "string"
+      required:
+      - "converter"
+      type: "object"
     WithLanguageGuesser:
       additionalProperties: false
       description: ""
@@ -3822,6 +3975,68 @@ info:
   version: "1.0.0"
 openapi: "3.0.0"
 paths:
+  /_external_resources:
+    delete:
+      operationId: "deleteExternalResources"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExternalResources"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalResources"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Delete external indexes and databases (response contains deletion\
+        \ failures)"
+      tags:
+      - "projects"
+    get:
+      operationId: "getExternalResources"
+      parameters:
+      - description: ""
+        explode: true
+        in: "query"
+        name: "ignoreIndexes"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "ignoreDatabases"
+        required: false
+        schema:
+          type: "string"
+        style: "form"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalResources"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "List non-sherpa indexes and databases"
+      tags:
+      - "projects"
   /annotate/_annotate_binary:
     post:
       operationId: "annotateBinaryWithPlan"
@@ -5710,6 +5925,43 @@ paths:
       summary: "deploy an already existing project"
       tags:
       - "projects"
+  /projects/_enroll_databases:
+    post:
+      operationId: "enrollDatabases"
+      parameters:
+      - description: ""
+        explode: true
+        in: "query"
+        name: "deploy"
+        required: false
+        schema:
+          default: true
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExternalDatabases"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalDatabases"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "enroll provided databases as project databases (response contains\
+        \ enrollment failures)"
+      tags:
+      - "projects"
   /projects/_import:
     post:
       operationId: "createProjectFromArchive"
@@ -5897,34 +6149,6 @@ paths:
                 $ref: "#/components/schemas/Error"
           description: "(to be documented)"
       summary: "create a project from an already uploaded archive"
-      tags:
-      - "projects"
-  /projects/_register:
-    post:
-      operationId: "registerProject"
-      parameters:
-      - description: "coma-separated database names"
-        explode: true
-        in: "query"
-        name: "databases"
-        required: true
-        schema:
-          type: "string"
-        style: "form"
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SherpaJobBean"
-          description: "(to be documented)"
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-          description: "(to be documented)"
-      summary: "register existing databases as projects"
       tags:
       - "projects"
   /projects/_reindex:
@@ -6649,6 +6873,87 @@ paths:
       summary: "split corpus in train and test sets"
       tags:
       - "projects"
+  /projects/{projectName}/alt_texts:
+    get:
+      operationId: "getAltTexts"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AltTextArray"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Get alternative document texts"
+      tags:
+      - "alt-texts"
+  /projects/{projectName}/alt_texts/_delete:
+    post:
+      operationId: "deleteAltTextsByName"
+      parameters:
+      - description: "project name"
+        explode: false
+        in: "path"
+        name: "projectName"
+        required: true
+        schema:
+          type: "string"
+        style: "simple"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "all"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "withDetails"
+        required: false
+        schema:
+          default: false
+          type: "boolean"
+        style: "form"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemRefArray"
+        description: "(to be documented)"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteManyResponse"
+          description: "(to be documented)"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: "(to be documented)"
+      summary: "Remove some or all alternative document texts"
+      tags:
+      - "alt-texts"
   /projects/{projectName}/annotationMetrics:
     get:
       operationId: "getAnnotationMetrics"
@@ -9069,6 +9374,15 @@ paths:
         required: false
         schema:
           default: false
+          type: "boolean"
+        style: "form"
+      - description: ""
+        explode: true
+        in: "query"
+        name: "presetMetadataValues"
+        required: false
+        schema:
+          default: true
           type: "boolean"
         style: "form"
       responses:
@@ -14221,6 +14535,8 @@ tags:
   name: "documents"
 - description: "Segments in projects"
   name: "segments"
+- description: "Documents alternative texts in projects"
+  name: "alt-texts"
 - description: "Annotation or category labels"
   name: "labels"
 - description: "Annotations in datasets"

@@ -8,7 +8,7 @@ reindexProjects
 changeProjectOwnership
 flushIndices
 autoDiscoverOnCorpus
-.*Campaign.*
+.*[cC]ampaign.*
 .*[uU]serSession.*
 getConfig
 exportDataset
