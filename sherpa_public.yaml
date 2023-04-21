@@ -3044,6 +3044,16 @@ components:
       items:
         $ref: '#/components/schemas/UploadedFile'
       type: array
+    UploadedFileInfo:
+      additionalProperties: false
+      description: ''
+      properties:
+        id:
+          description: ''
+          type: string
+      required:
+      - id
+      type: object
     UserPermissionsUpdate:
       additionalProperties: false
       description: ''
@@ -11515,6 +11525,85 @@ paths:
       summary: Filter the list of available services
       tags:
       - services
+  /uploads:
+    post:
+      operationId: uploadFiles
+      parameters:
+      - description: TTL of the upload in seconds
+        explode: true
+        in: query
+        name: ttl
+        required: false
+        schema:
+          default: 0
+          format: int64
+          type: integer
+        style: form
+      - description: Also copy the uploaded file in the images directory (same TTL)
+        explode: true
+        in: query
+        name: image
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  format: binary
+                  type: string
+              type: object
+        description: (to be documented)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadedFileArray'
+          description: (to be documented)
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: (to be documented)
+      summary: ''
+      tags:
+      - uploads
+  /uploads/{id}:
+    get:
+      operationId: getUploadedFileInfo
+      parameters:
+      - description: ''
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadedFileInfo'
+          description: (to be documented)
+        '404':
+          description: no such element
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: (to be documented)
+      summary: ''
+      tags:
+      - uploads
   /users:
     get:
       operationId: getUsers

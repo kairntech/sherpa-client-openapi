@@ -32,5 +32,4 @@ getRoles
 deleteRole
 getServicesDistinctValues
 getEngineParametersSchema
-uploadFiles
-getUploadedFileInfo
+
