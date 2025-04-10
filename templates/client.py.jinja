@@ -104,7 +104,7 @@ class SherpaClient(Client):
             auth=BasicAuth(username=credentials.email, password=credentials.password),
             headers={"User-Agent": f"{my_version.key}/{my_version.parsed_version}"},
         )
-        res: HttpxResponse = httpx_client.get("/users", params={"username": credentials.email})
+        res: HttpxResponse = httpx_client.get("/current_user")
         if res.is_success and res.cookies:
             self.session_cookies = {k: res.cookies[k] for k in res.cookies}
         else:
@@ -117,6 +117,7 @@ class SherpaClient(Client):
         project_access_mode: Union[Unset, None, RequestJwtTokenProjectAccessMode] = UNSET,
         annotate_only: Union[Unset, None, bool] = False,
         login_only: Union[Unset, None, bool] = False,
+        no_permissions: Union[Unset, None, bool] = False,
     ):
         """ """
         from .api.authentication import request_jwt_token
@@ -133,3 +134,22 @@ class SherpaClient(Client):
             self.token = r.parsed.access_token
         else:
             r.raise_for_status()
+
+
+    def login_with_apikey(
+        self,
+            api_key_header_name: str,
+            token: str
+    ):
+        """ """
+        self.auth_header_name = api_key_header_name
+        self.token = token
+        self.prefix = None
+        httpx_client = HttpxClient(
+            base_url=self.base_url,
+            headers=self.get_headers()
+,
+        )
+        res: HttpxResponse = httpx_client.get("/current_user")
+        if not res.is_success:
+            res.raise_for_status()

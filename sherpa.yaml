@@ -210,6 +210,9 @@ components:
           description: ""
           format: "int32"
           type: "integer"
+        text:
+          description: ""
+          type: "string"
       required:
       - "end"
       - "start"
@@ -1412,6 +1415,9 @@ components:
           description: ""
           format: "int32"
           type: "integer"
+        text:
+          description: ""
+          type: "string"
       required:
       - "end"
       - "start"
