@@ -1,22 +1,24 @@
 """ Contains some shared types for properties """
-from http import HTTPStatus
-from typing import Any, BinaryIO, Generic, MutableMapping, Optional, Tuple, TypeVar
 
-import attr
-from httpx import codes, HTTPError
+from collections.abc import MutableMapping
+from http import HTTPStatus
+from typing import BinaryIO, Generic, Optional, TypeVar, Literal
+
+from attrs import define
+from httpx import HTTPError, codes
 
 class Unset:
-    def __bool__(self) -> bool:
+    def __bool__(self) -> Literal[False]:
         return False
 
 
 UNSET: Unset = Unset()
 
 {# Used as `FileProperty._json_type_string` #}
-FileJsonType = Tuple[Optional[str], BinaryIO, Optional[str]]
+FileJsonType = tuple[Optional[str], BinaryIO, Optional[str]]
 
 
-@attr.s(auto_attribs=True)
+@define
 class File:
     """ Contains information for file uploads """
 
@@ -32,7 +34,7 @@ class File:
 T = TypeVar("T")
 
 
-@attr.s(auto_attribs=True)
+@define
 class Response(Generic[T]):
     """ A response from an endpoint """
 
@@ -135,5 +137,6 @@ class Response(Generic[T]):
 
         if http_error_msg:
             raise HTTPError(http_error_msg)
-            
-__all__ = ["File", "Response", "FileJsonType"]
+
+
+__all__ = ["UNSET", "File", "FileJsonType", "Response", "Unset"]
