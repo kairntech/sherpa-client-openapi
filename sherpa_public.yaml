@@ -607,6 +607,7 @@ components:
           type: string
       required:
       - access_token
+      - email
       type: object
     Bucket:
       additionalProperties: false
@@ -748,6 +749,9 @@ components:
       properties:
         classification:
           $ref: '#/components/schemas/ClassificationOptions'
+        cleanHtml:
+          description: ''
+          type: boolean
         collaborativeAnnotation:
           description: ''
           type: boolean
@@ -769,11 +773,17 @@ components:
         label:
           description: ''
           type: string
+        markdownContent:
+          description: ''
+          type: boolean
         metafacets:
           items:
             description: ''
             type: string
           type: array
+        replaceCarriageReturns:
+          description: ''
+          type: boolean
         routeOnOpenProject:
           description: ''
           type: string
@@ -1109,6 +1119,7 @@ components:
           - KO
           type: string
       required:
+      - identifier
       - labelName
       type: object
     DocSentence:
@@ -3068,6 +3079,7 @@ components:
           description: ''
           type: string
       required:
+      - description
       - image
       - label
       - lang
@@ -3262,6 +3274,14 @@ components:
         answerLanguage:
           description: Language of the answer (overrides languageSource)
           type: string
+        context:
+          default: false
+          description: Generate answer to the question
+          type: boolean
+        contextOnly:
+          default: false
+          description: ''
+          type: boolean
         enabled:
           default: false
           description: Generate answer to the question
@@ -3269,6 +3289,10 @@ components:
         generator:
           description: Answer generator to be used
           type: string
+        html:
+          default: false
+          description: ''
+          type: boolean
         languageDetection:
           default: project
           description: Source used to decide the language of the answer
@@ -3537,6 +3561,12 @@ components:
           items:
             $ref: '#/components/schemas/Aggregation'
           type: array
+        answer:
+          description: ''
+          type: string
+        context:
+          description: ''
+          type: string
         hits:
           items:
             $ref: '#/components/schemas/SegmentHit'
@@ -6687,6 +6717,15 @@ paths:
       - description: ''
         explode: true
         in: query
+        name: estimatedCounts
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: ''
+        explode: true
+        in: query
         name: groupName
         required: false
         schema:
@@ -7382,6 +7421,15 @@ paths:
         required: false
         schema:
           default: true
+          type: boolean
+        style: form
+      - description: ''
+        explode: true
+        in: query
+        name: estimatedCounts
+        required: false
+        schema:
+          default: false
           type: boolean
         style: form
       responses:
@@ -8580,11 +8628,38 @@ paths:
       - description: ''
         explode: true
         in: query
+        name: computeFacets
+        required: false
+        schema:
+          default: true
+          type: boolean
+        style: form
+      - description: ''
+        explode: true
+        in: query
         name: facet
         required: false
         schema:
           default: ''
           type: string
+        style: form
+      - description: ''
+        explode: true
+        in: query
+        name: computeCorpusSize
+        required: false
+        schema:
+          default: true
+          type: boolean
+        style: form
+      - description: ''
+        explode: true
+        in: query
+        name: estimatedCounts
+        required: false
+        schema:
+          default: false
+          type: boolean
         style: form
       responses:
         '200':
@@ -8697,8 +8772,12 @@ paths:
         name: cleanText
         required: false
         schema:
-          default: true
-          type: boolean
+          default: default
+          enum:
+          - 'true'
+          - 'false'
+          - default
+          type: string
         style: form
       - description: assign categories on text documents according to their source
           folder in the archive
@@ -8811,8 +8890,12 @@ paths:
         name: cleanText
         required: false
         schema:
-          default: true
-          type: boolean
+          default: default
+          enum:
+          - 'true'
+          - 'false'
+          - default
+          type: string
         style: form
       - description: restrict visibility of documents to this sherpa group
         explode: true
@@ -8912,8 +8995,12 @@ paths:
         name: cleanText
         required: false
         schema:
-          default: true
-          type: boolean
+          default: default
+          enum:
+          - 'true'
+          - 'false'
+          - default
+          type: string
         style: form
       - description: assign categories on text documents according to their source
           folder in the archive
